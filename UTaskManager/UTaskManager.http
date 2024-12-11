@@ -1,0 +1,6 @@
+@UTaskManager_HostAddress = http://localhost:5197
+
+GET {{UTaskManager_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

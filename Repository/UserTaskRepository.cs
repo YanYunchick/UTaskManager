@@ -13,7 +13,10 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
     public UserTaskRepository(RepositoryContext repositoryContext)
         : base(repositoryContext)
     {
-
-        
     }
+
+    public IEnumerable<UserTask> GetAllUserTasks(bool trackChanges) =>
+        FindAll(trackChanges)
+        .OrderBy(ut => ut.Title)
+        .ToList();
 }

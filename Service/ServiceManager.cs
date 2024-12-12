@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using AutoMapper;
+using Contracts;
 using Service.Contracts;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ public sealed class ServiceManager : IServiceManager
 {
     private readonly Lazy<IUserTaskService> _userTaskService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger)
+    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper)
     {
-        _userTaskService = new Lazy<IUserTaskService>(() => new UserTaskService(repositoryManager, logger));
+        _userTaskService = new Lazy<IUserTaskService>(() => new UserTaskService(repositoryManager, logger, mapper));
     }
 
     public IUserTaskService UserTaskService => _userTaskService.Value;

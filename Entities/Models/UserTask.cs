@@ -15,7 +15,7 @@ namespace Entities.Models
 
         [Required(ErrorMessage = "Task title is a required field.")]
         [MaxLength(60, ErrorMessage = " Maximum length for the Title is 60 characters.")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         public string? Description { get; set; }
         public int Priority { get; set; }

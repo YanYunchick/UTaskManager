@@ -26,17 +26,10 @@ internal sealed class UserTaskService : IUserTaskService
 
     public IEnumerable<UserTaskDto> GetAllUserTasks(bool trackChanges)
     {
-        try
-        {
-            var userTasks = _repository.UserTask.GetAllUserTasks(trackChanges);
 
-            var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasks);
-            return userTasksDto;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Something went wrong in the {nameof(GetAllUserTasks)} service method {ex}");
-            throw;
-        }
+        var userTasks = _repository.UserTask.GetAllUserTasks(trackChanges);
+
+        var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasks);
+        return userTasksDto;
     }
 }

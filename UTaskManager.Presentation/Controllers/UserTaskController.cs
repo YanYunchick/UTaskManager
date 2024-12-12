@@ -22,14 +22,7 @@ public class UserTaskController : ControllerBase
     [HttpGet]
     public IActionResult GetCompanies()
     {
-        try
-        {
-            var userTasks = _service.UserTaskService.GetAllUserTasks(trackChanges: false);
-            return Ok(userTasks);
-        }
-        catch
-        {
-            return StatusCode(500, "Internal server error");
-        }
+        var userTasks = _service.UserTaskService.GetAllUserTasks(trackChanges: false);
+        return Ok(userTasks);
     }
 }

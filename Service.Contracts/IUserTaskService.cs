@@ -10,4 +10,5 @@ namespace Service.Contracts;
 public interface IUserTaskService
 {
     IEnumerable<UserTaskDto> GetAllUserTasks(bool trackChanges);
+    UserTaskDto GetUserTask(Guid userTaskId, bool trackChanges);
 }

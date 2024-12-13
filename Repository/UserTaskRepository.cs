@@ -19,4 +19,11 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
         FindAll(trackChanges)
         .OrderBy(ut => ut.Title)
         .ToList();
+
+    public UserTask GetUserTask(Guid userTaskId, bool trackChanges) =>
+        FindByCondition(ut => ut.Id.Equals(userTaskId), trackChanges)
+        .SingleOrDefault()!;
+
+
+
 }

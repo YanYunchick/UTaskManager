@@ -11,4 +11,5 @@ namespace Contracts;
 public interface IUserTaskRepository
 {
     IEnumerable<UserTask> GetAllUserTasks(bool trackChanges);
+    UserTask GetUserTask(Guid userTaskId, bool trackChanges);
 }

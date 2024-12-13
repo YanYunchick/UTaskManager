@@ -20,9 +20,16 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetCompanies()
+    public IActionResult GetUserTasks()
     {
         var userTasks = _service.UserTaskService.GetAllUserTasks(trackChanges: false);
         return Ok(userTasks);
+    }
+
+    [HttpGet("{id:guid}")]
+    public IActionResult GetUserTask(Guid id)
+    {
+        var userTask = _service.UserTaskService.GetUserTask(id, trackChanges: false);
+        return Ok(userTask);
     }
 }

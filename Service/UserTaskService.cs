@@ -1,5 +1,6 @@
 ﻿using Service.Contracts;
 using Contracts;
+using Entities.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,5 +32,15 @@ internal sealed class UserTaskService : IUserTaskService
 
         var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasks);
         return userTasksDto;
+    }
+
+    public UserTaskDto GetUserTask(Guid id, bool trackChanges)
+    {
+        var userTask = _repository.UserTask.GetUserTask(id, trackChanges);
+        if (userTask is null)
+            throw new UserTaskNotFoundException(id);
+
+        var userTaskDto = _mapper.Map<UserTaskDto>(userTask);
+        return userTaskDto;
     }
 }

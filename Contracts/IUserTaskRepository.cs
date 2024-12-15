@@ -12,4 +12,6 @@ public interface IUserTaskRepository
 {
     IEnumerable<UserTask> GetAllUserTasks(bool trackChanges);
     UserTask GetUserTask(Guid userTaskId, bool trackChanges);
+    void CreateUserTask(UserTask userTask);
+    IEnumerable<UserTask> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
 }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DataTransferObjects;
+using UTaskManager.Presentation.ModelBinders;
 
 namespace UTaskManager.Presentation.Controllers;
 
@@ -26,10 +28,30 @@ public class UserTaskController : ControllerBase
         return Ok(userTasks);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "UserTaskById")]
     public IActionResult GetUserTask(Guid id)
     {
         var userTask = _service.UserTaskService.GetUserTask(id, trackChanges: false);
         return Ok(userTask);
+    }
+
+    [HttpPost]
+    public IActionResult CreateUserTask([FromBody] UserTaskForCreationDto userTask)
+    {
+        if (userTask is null)
+            return BadRequest("UserTaskForCreation object is null");
+
+        var createdUserTask = _service.UserTaskService.CreateUserTask(userTask);
+
+        return CreatedAtRoute("UserTaskById", new { id = createdUserTask.Id }, createdUserTask);
+    }
+
+    [HttpGet("collection/({ids})", Name = "UserTaskCollection")]
+    public IActionResult GetUserTaskCollection(
+        [ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
+    {
+        var userTasks = _service.UserTaskService.GetByIds(ids, trackChanges: false);
+
+        return Ok(userTasks);
     }
 }

@@ -24,6 +24,10 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
         FindByCondition(ut => ut.Id.Equals(userTaskId), trackChanges)
         .SingleOrDefault()!;
 
+    public void CreateUserTask(UserTask userTask) => Create(userTask);
 
+    public IEnumerable<UserTask> GetByIds(IEnumerable<Guid> ids, bool trackChanges) =>
+        FindByCondition(x => ids.Contains(x.Id), trackChanges)
+        .ToList();
 
 }

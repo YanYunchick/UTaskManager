@@ -43,4 +43,32 @@ internal sealed class UserTaskService : IUserTaskService
         var userTaskDto = _mapper.Map<UserTaskDto>(userTask);
         return userTaskDto;
     }
+
+    public UserTaskDto CreateUserTask(UserTaskForCreationDto userTask)
+    {
+        var userTaskEntity = _mapper.Map<UserTask>(userTask);
+        userTaskEntity.UpdatedAt = DateTime.Now;
+        userTaskEntity.CreatedAt = DateTime.Now;
+
+        _repository.UserTask.CreateUserTask(userTaskEntity);
+        _repository.Save();
+
+        var userTaskToReturn = _mapper.Map<UserTaskDto>(userTaskEntity);
+
+        return userTaskToReturn;
+    }
+
+    public IEnumerable<UserTaskDto> GetByIds(IEnumerable<Guid> ids, bool trackChanges)
+    {
+        if (ids is null)
+            throw new IdParametersBadRequestException();
+
+        var userTaskEntities = _repository.UserTask.GetByIds(ids, trackChanges);
+        if (ids.Count() != userTaskEntities.Count())
+            throw new CollectionByIdsBadRequestException();
+
+        var userTasksToReturn = _mapper.Map<IEnumerable<UserTaskDto>>(userTaskEntities);
+
+        return userTasksToReturn;
+    }
 }

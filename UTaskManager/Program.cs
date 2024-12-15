@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using UTaskManager.Extensions;
 using NLog;
 using Contracts;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,10 @@ builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;

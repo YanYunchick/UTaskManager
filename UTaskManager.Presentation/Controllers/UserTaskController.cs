@@ -54,4 +54,12 @@ public class UserTaskController : ControllerBase
 
         return Ok(userTasks);
     }
+
+    [HttpDelete("{id:guid}")]
+    public IActionResult DeleteUserTask(Guid id)
+    {
+        _service.UserTaskService.DeleteUserTask(id, trackChanges: false);
+
+        return NoContent();
+    }
 }

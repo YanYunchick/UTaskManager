@@ -71,4 +71,14 @@ internal sealed class UserTaskService : IUserTaskService
 
         return userTasksToReturn;
     }
+
+    public void DeleteUserTask(Guid userTaskId, bool trackChanges)
+    {
+        var userTask = _repository.UserTask.GetUserTask(userTaskId, trackChanges);
+        if (userTask is null)
+            throw new UserTaskNotFoundException(userTaskId);
+
+        _repository.UserTask.DeleteUserTask(userTask);
+        _repository.Save();
+    }
 }

@@ -30,4 +30,6 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
         FindByCondition(x => ids.Contains(x.Id), trackChanges)
         .ToList();
 
+    public void DeleteUserTask(UserTask userTask) => Delete(userTask); 
+
 }

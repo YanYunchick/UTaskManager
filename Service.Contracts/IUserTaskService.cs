@@ -15,4 +15,5 @@ public interface IUserTaskService
     UserTaskDto CreateUserTask(UserTaskForCreationDto userTask);
     IEnumerable<UserTaskDto> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
     void DeleteUserTask(Guid userTaskId, bool trackChanges);
+    void UpdateUserTask(Guid userTaskId, UserTaskForUpdateDto userTask, bool trackChanges);
 }

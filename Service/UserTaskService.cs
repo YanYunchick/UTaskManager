@@ -81,4 +81,16 @@ internal sealed class UserTaskService : IUserTaskService
         _repository.UserTask.DeleteUserTask(userTask);
         _repository.Save();
     }
+
+    public void UpdateUserTask(Guid userTaskId, UserTaskForUpdateDto userTaskForUpdate, bool trackChanges)
+    {
+        var userTaskEntity = _repository.UserTask.GetUserTask(userTaskId, trackChanges);
+        if (userTaskEntity is null)
+            throw new UserTaskNotFoundException(userTaskId);
+
+        _mapper.Map(userTaskForUpdate, userTaskEntity);
+        userTaskEntity.UpdatedAt = DateTime.Now;
+
+        _repository.Save();
+    }
 }

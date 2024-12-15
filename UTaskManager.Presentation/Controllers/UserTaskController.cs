@@ -62,4 +62,15 @@ public class UserTaskController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id:guid}")]
+    public IActionResult UpdateUserTask(Guid id, [FromBody] UserTaskForUpdateDto userTask)
+    {
+        if (userTask is null)
+            return BadRequest("UserTaskForUpdateDto object is null");
+
+        _service.UserTaskService.UpdateUserTask(id, userTask, trackChanges: true);
+
+        return NoContent();
+    }
 }

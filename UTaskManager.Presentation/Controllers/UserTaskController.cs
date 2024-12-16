@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -70,6 +71,21 @@ public class UserTaskController : ControllerBase
             return BadRequest("UserTaskForUpdateDto object is null");
 
         _service.UserTaskService.UpdateUserTask(id, userTask, trackChanges: true);
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}")]
+    public IActionResult PartiallyUpdateUserTask(Guid id, [FromBody] JsonPatchDocument<UserTaskForUpdateDto> patchDoc)
+    {
+        if (patchDoc is null)
+            return BadRequest("patchDoc object sent from client is null");
+
+        var result = _service.UserTaskService.GetUserTaskForPatch(id, trackChanges: true);
+
+        patchDoc.ApplyTo(result.userTaskToPatch);
+
+        _service.UserTaskService.SaveChangesForPatch(result.userTaskToPatch, result.userTaskEntity);
 
         return NoContent();
     }

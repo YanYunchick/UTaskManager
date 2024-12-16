@@ -93,4 +93,21 @@ internal sealed class UserTaskService : IUserTaskService
 
         _repository.Save();
     }
+
+    public (UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity) GetUserTaskForPatch(
+        Guid userTaskId, bool trackChanges)
+    {
+        var userTaskEntity = _repository.UserTask.GetUserTask(userTaskId, trackChanges);
+        if (userTaskEntity is null)
+            throw new UserTaskNotFoundException(userTaskId);
+
+        var userTaskToPatch = _mapper.Map<UserTaskForUpdateDto>(userTaskEntity);
+        return (userTaskToPatch, userTaskEntity);
+    }
+
+    public void SaveChangesForPatch(UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity)
+    {
+        _mapper.Map(userTaskToPatch, userTaskEntity);
+        _repository.Save();
+    }
 }

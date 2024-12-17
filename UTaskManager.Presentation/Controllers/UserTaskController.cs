@@ -42,6 +42,9 @@ public class UserTaskController : ControllerBase
         if (userTask is null)
             return BadRequest("UserTaskForCreation object is null");
 
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
         var createdUserTask = _service.UserTaskService.CreateUserTask(userTask);
 
         return CreatedAtRoute("UserTaskById", new { id = createdUserTask.Id }, createdUserTask);
@@ -70,6 +73,9 @@ public class UserTaskController : ControllerBase
         if (userTask is null)
             return BadRequest("UserTaskForUpdateDto object is null");
 
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
         _service.UserTaskService.UpdateUserTask(id, userTask, trackChanges: true);
 
         return NoContent();
@@ -83,7 +89,12 @@ public class UserTaskController : ControllerBase
 
         var result = _service.UserTaskService.GetUserTaskForPatch(id, trackChanges: true);
 
-        patchDoc.ApplyTo(result.userTaskToPatch);
+        patchDoc.ApplyTo(result.userTaskToPatch, ModelState);
+
+        TryValidateModel(result.userTaskToPatch);
+
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
 
         _service.UserTaskService.SaveChangesForPatch(result.userTaskToPatch, result.userTaskEntity);
 

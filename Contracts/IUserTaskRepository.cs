@@ -10,9 +10,9 @@ namespace Contracts;
 
 public interface IUserTaskRepository
 {
-    IEnumerable<UserTask> GetAllUserTasks(bool trackChanges);
-    UserTask GetUserTask(Guid userTaskId, bool trackChanges);
+    Task<IEnumerable<UserTask>> GetAllUserTasksAsync(bool trackChanges);
+    Task<UserTask> GetUserTaskAsync(Guid userTaskId, bool trackChanges);
     void CreateUserTask(UserTask userTask);
-    IEnumerable<UserTask> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
+    Task<IEnumerable<UserTask>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
     void DeleteUserTask(UserTask userTask);
 }

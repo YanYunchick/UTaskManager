@@ -11,13 +11,13 @@ namespace Service.Contracts;
 
 public interface IUserTaskService
 {
-    IEnumerable<UserTaskDto> GetAllUserTasks(bool trackChanges);
-    UserTaskDto GetUserTask(Guid userTaskId, bool trackChanges);
-    UserTaskDto CreateUserTask(UserTaskForCreationDto userTask);
-    IEnumerable<UserTaskDto> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
-    void DeleteUserTask(Guid userTaskId, bool trackChanges);
-    void UpdateUserTask(Guid userTaskId, UserTaskForUpdateDto userTask, bool trackChanges);
-    (UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity) GetUserTaskForPatch(
+    Task<IEnumerable<UserTaskDto>> GetAllUserTasksAsync(bool trackChanges);
+    Task<UserTaskDto> GetUserTaskAsync(Guid userTaskId, bool trackChanges);
+    Task<UserTaskDto> CreateUserTaskAsync(UserTaskForCreationDto userTask);
+    Task<IEnumerable<UserTaskDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
+    Task DeleteUserTaskAsync(Guid userTaskId, bool trackChanges);
+    Task UpdateUserTaskAsync(Guid userTaskId, UserTaskForUpdateDto userTask, bool trackChanges);
+    Task<(UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity)> GetUserTaskForPatchAsync(
         Guid userTaskId, bool trackChanges);
-    void SaveChangesForPatch(UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity);
+    Task SaveChangesForPatchAsync(UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity);
 }

@@ -10,5 +10,5 @@ public interface IRepositoryManager
 {
     IUserTaskRepository UserTask { get; }
 
-    void Save();
+    Task SaveAsync();
 }

@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +16,20 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
     {
     }
 
-    public IEnumerable<UserTask> GetAllUserTasks(bool trackChanges) =>
-        FindAll(trackChanges)
+    public async Task<IEnumerable<UserTask>> GetAllUserTasksAsync(bool trackChanges) =>
+        await FindAll(trackChanges)
         .OrderBy(ut => ut.Title)
-        .ToList();
+        .ToListAsync();
 
-    public UserTask GetUserTask(Guid userTaskId, bool trackChanges) =>
-        FindByCondition(ut => ut.Id.Equals(userTaskId), trackChanges)
-        .SingleOrDefault()!;
+    public async Task<UserTask> GetUserTaskAsync(Guid userTaskId, bool trackChanges) =>
+        await FindByCondition(ut => ut.Id.Equals(userTaskId), trackChanges)
+        .SingleOrDefaultAsync()!;
 
     public void CreateUserTask(UserTask userTask) => Create(userTask);
 
-    public IEnumerable<UserTask> GetByIds(IEnumerable<Guid> ids, bool trackChanges) =>
-        FindByCondition(x => ids.Contains(x.Id), trackChanges)
-        .ToList();
+    public async Task<IEnumerable<UserTask>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges) =>
+        await FindByCondition(x => ids.Contains(x.Id), trackChanges)
+        .ToListAsync();
 
     public void DeleteUserTask(UserTask userTask) => Delete(userTask); 
 

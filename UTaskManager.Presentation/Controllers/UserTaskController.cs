@@ -23,21 +23,21 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetUserTasks()
+    public async Task<IActionResult> GetUserTasks()
     {
-        var userTasks = _service.UserTaskService.GetAllUserTasks(trackChanges: false);
+        var userTasks = await _service.UserTaskService.GetAllUserTasksAsync(trackChanges: false);
         return Ok(userTasks);
     }
 
     [HttpGet("{id:guid}", Name = "UserTaskById")]
-    public IActionResult GetUserTask(Guid id)
+    public async Task<IActionResult> GetUserTask(Guid id)
     {
-        var userTask = _service.UserTaskService.GetUserTask(id, trackChanges: false);
+        var userTask = await _service.UserTaskService.GetUserTaskAsync(id, trackChanges: false);
         return Ok(userTask);
     }
 
     [HttpPost]
-    public IActionResult CreateUserTask([FromBody] UserTaskForCreationDto userTask)
+    public async Task<IActionResult> CreateUserTask([FromBody] UserTaskForCreationDto userTask)
     {
         if (userTask is null)
             return BadRequest("UserTaskForCreation object is null");
@@ -45,30 +45,30 @@ public class UserTaskController : ControllerBase
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var createdUserTask = _service.UserTaskService.CreateUserTask(userTask);
+        var createdUserTask = await _service.UserTaskService.CreateUserTaskAsync(userTask);
 
         return CreatedAtRoute("UserTaskById", new { id = createdUserTask.Id }, createdUserTask);
     }
 
     [HttpGet("collection/({ids})", Name = "UserTaskCollection")]
-    public IActionResult GetUserTaskCollection(
+    public async Task<IActionResult> GetUserTaskCollection(
         [ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
     {
-        var userTasks = _service.UserTaskService.GetByIds(ids, trackChanges: false);
+        var userTasks = await _service.UserTaskService.GetByIdsAsync(ids, trackChanges: false);
 
         return Ok(userTasks);
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult DeleteUserTask(Guid id)
+    public async Task<IActionResult> DeleteUserTask(Guid id)
     {
-        _service.UserTaskService.DeleteUserTask(id, trackChanges: false);
+        await _service.UserTaskService.DeleteUserTaskAsync(id, trackChanges: false);
 
         return NoContent();
     }
 
     [HttpPut("{id:guid}")]
-    public IActionResult UpdateUserTask(Guid id, [FromBody] UserTaskForUpdateDto userTask)
+    public async Task<IActionResult> UpdateUserTask(Guid id, [FromBody] UserTaskForUpdateDto userTask)
     {
         if (userTask is null)
             return BadRequest("UserTaskForUpdateDto object is null");
@@ -76,18 +76,18 @@ public class UserTaskController : ControllerBase
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        _service.UserTaskService.UpdateUserTask(id, userTask, trackChanges: true);
+        await _service.UserTaskService.UpdateUserTaskAsync(id, userTask, trackChanges: true);
 
         return NoContent();
     }
 
     [HttpPatch("{id:guid}")]
-    public IActionResult PartiallyUpdateUserTask(Guid id, [FromBody] JsonPatchDocument<UserTaskForUpdateDto> patchDoc)
+    public async Task<IActionResult> PartiallyUpdateUserTask(Guid id, [FromBody] JsonPatchDocument<UserTaskForUpdateDto> patchDoc)
     {
         if (patchDoc is null)
             return BadRequest("patchDoc object sent from client is null");
 
-        var result = _service.UserTaskService.GetUserTaskForPatch(id, trackChanges: true);
+        var result = await _service.UserTaskService.GetUserTaskForPatchAsync(id, trackChanges: true);
 
         patchDoc.ApplyTo(result.userTaskToPatch, ModelState);
 
@@ -96,7 +96,7 @@ public class UserTaskController : ControllerBase
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        _service.UserTaskService.SaveChangesForPatch(result.userTaskToPatch, result.userTaskEntity);
+        await _service.UserTaskService.SaveChangesForPatchAsync(result.userTaskToPatch, result.userTaskEntity);
 
         return NoContent();
     }

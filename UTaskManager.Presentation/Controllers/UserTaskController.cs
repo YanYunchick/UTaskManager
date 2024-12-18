@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using UTaskManager.Presentation.ActionFilters;
 using UTaskManager.Presentation.ModelBinders;
 
 namespace UTaskManager.Presentation.Controllers;
@@ -37,14 +38,9 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateUserTask([FromBody] UserTaskForCreationDto userTask)
     {
-        if (userTask is null)
-            return BadRequest("UserTaskForCreation object is null");
-
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
-
         var createdUserTask = await _service.UserTaskService.CreateUserTaskAsync(userTask);
 
         return CreatedAtRoute("UserTaskById", new { id = createdUserTask.Id }, createdUserTask);
@@ -68,14 +64,9 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateUserTask(Guid id, [FromBody] UserTaskForUpdateDto userTask)
     {
-        if (userTask is null)
-            return BadRequest("UserTaskForUpdateDto object is null");
-
-        if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
-
         await _service.UserTaskService.UpdateUserTaskAsync(id, userTask, trackChanges: true);
 
         return NoContent();

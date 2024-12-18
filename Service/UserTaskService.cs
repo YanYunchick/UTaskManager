@@ -36,9 +36,7 @@ internal sealed class UserTaskService : IUserTaskService
 
     public async Task<UserTaskDto> GetUserTaskAsync(Guid id, bool trackChanges)
     {
-        var userTask = await _repository.UserTask.GetUserTaskAsync(id, trackChanges);
-        if (userTask is null)
-            throw new UserTaskNotFoundException(id);
+        var userTask = await GetUserTaskAndCheckIfItExists(id, trackChanges);
 
         var userTaskDto = _mapper.Map<UserTaskDto>(userTask);
         return userTaskDto;
@@ -74,9 +72,7 @@ internal sealed class UserTaskService : IUserTaskService
 
     public async Task DeleteUserTaskAsync(Guid userTaskId, bool trackChanges)
     {
-        var userTask = await _repository.UserTask.GetUserTaskAsync(userTaskId, trackChanges);
-        if (userTask is null)
-            throw new UserTaskNotFoundException(userTaskId);
+        var userTask = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
 
         _repository.UserTask.DeleteUserTask(userTask);
         await _repository.SaveAsync();
@@ -84,9 +80,7 @@ internal sealed class UserTaskService : IUserTaskService
 
     public async Task UpdateUserTaskAsync(Guid userTaskId, UserTaskForUpdateDto userTaskForUpdate, bool trackChanges)
     {
-        var userTaskEntity = await _repository.UserTask.GetUserTaskAsync(userTaskId, trackChanges);
-        if (userTaskEntity is null)
-            throw new UserTaskNotFoundException(userTaskId);
+        var userTaskEntity = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
 
         _mapper.Map(userTaskForUpdate, userTaskEntity);
         userTaskEntity.UpdatedAt = DateTime.Now;
@@ -97,9 +91,7 @@ internal sealed class UserTaskService : IUserTaskService
     public async Task<(UserTaskForUpdateDto userTaskToPatch, UserTask userTaskEntity)> GetUserTaskForPatchAsync(
         Guid userTaskId, bool trackChanges)
     {
-        var userTaskEntity = await _repository.UserTask.GetUserTaskAsync(userTaskId, trackChanges);
-        if (userTaskEntity is null)
-            throw new UserTaskNotFoundException(userTaskId);
+        var userTaskEntity = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
 
         var userTaskToPatch = _mapper.Map<UserTaskForUpdateDto>(userTaskEntity);
         return (userTaskToPatch, userTaskEntity);
@@ -109,5 +101,13 @@ internal sealed class UserTaskService : IUserTaskService
     {
         _mapper.Map(userTaskToPatch, userTaskEntity);
         await _repository.SaveAsync();
+    }
+
+    private async Task<UserTask> GetUserTaskAndCheckIfItExists(Guid id, bool trackChanges)
+    {
+        var userTask = await _repository.UserTask.GetUserTaskAsync(id, trackChanges);
+        if (userTask is null)
+            throw new UserTaskNotFoundException(id);
+        return userTask;
     }
 }

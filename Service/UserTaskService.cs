@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Entities.Models;
 using Shared.DataTransferObjects;
 using AutoMapper;
+using Shared.RequestFeatures;
 
 namespace Service;
 
@@ -25,13 +26,12 @@ internal sealed class UserTaskService : IUserTaskService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserTaskDto>> GetAllUserTasksAsync(bool trackChanges)
+    public async Task<(IEnumerable<UserTaskDto> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
     {
+        var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(userTaskParameters, trackChanges);
 
-        var userTasks = await _repository.UserTask.GetAllUserTasksAsync(trackChanges);
-
-        var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasks);
-        return userTasksDto;
+        var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasksWithMetaData);
+        return (userTasks: userTasksDto, metaData: userTasksWithMetaData.MetaData);
     }
 
     public async Task<UserTaskDto> GetUserTaskAsync(Guid id, bool trackChanges)

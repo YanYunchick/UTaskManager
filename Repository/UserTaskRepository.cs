@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,14 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
     {
     }
 
-    public async Task<IEnumerable<UserTask>> GetAllUserTasksAsync(bool trackChanges) =>
-        await FindAll(trackChanges)
-        .OrderBy(ut => ut.Title)
-        .ToListAsync();
+    public async Task<PagedList<UserTask>> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
+    {
+        var userTasks = await FindAll(trackChanges)
+                                .OrderBy(ut => ut.Title)
+                                .ToListAsync();
+
+        return PagedList<UserTask>.ToPagedList(userTasks, userTaskParameters.PageNumber, userTaskParameters.PageSize);
+    }
 
     public async Task<UserTask> GetUserTaskAsync(Guid userTaskId, bool trackChanges) =>
         await FindByCondition(ut => ut.Id.Equals(userTaskId), trackChanges)

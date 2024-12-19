@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Contracts;
 
 public interface IUserTaskRepository
 {
-    Task<IEnumerable<UserTask>> GetAllUserTasksAsync(bool trackChanges);
+    Task<PagedList<UserTask>> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges);
     Task<UserTask> GetUserTaskAsync(Guid userTaskId, bool trackChanges);
     void CreateUserTask(UserTask userTask);
     Task<IEnumerable<UserTask>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

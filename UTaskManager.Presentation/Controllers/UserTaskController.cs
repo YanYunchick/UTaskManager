@@ -9,6 +9,9 @@ using Service.Contracts;
 using Shared.DataTransferObjects;
 using UTaskManager.Presentation.ActionFilters;
 using UTaskManager.Presentation.ModelBinders;
+using Shared.RequestFeatures;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace UTaskManager.Presentation.Controllers;
 
@@ -24,10 +27,13 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserTasks()
+    public async Task<IActionResult> GetUserTasks([FromQuery] UserTaskParameters userTaskParameters)
     {
-        var userTasks = await _service.UserTaskService.GetAllUserTasksAsync(trackChanges: false);
-        return Ok(userTasks);
+        var pagedResult = await _service.UserTaskService.GetAllUserTasksAsync(userTaskParameters, trackChanges: false);
+
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.userTasks);
     }
 
     [HttpGet("{id:guid}", Name = "UserTaskById")]

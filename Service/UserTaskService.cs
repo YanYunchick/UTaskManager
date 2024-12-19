@@ -28,6 +28,12 @@ internal sealed class UserTaskService : IUserTaskService
 
     public async Task<(IEnumerable<UserTaskDto> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
     {
+        if (!userTaskParameters.ValidPriority)
+            throw new UserTaskPriorityBadRequestException();
+
+        if (!userTaskParameters.ValidStatus)
+            throw new UserTaskStatusBadRequestException();
+
         var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(userTaskParameters, trackChanges);
 
         var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasksWithMetaData);

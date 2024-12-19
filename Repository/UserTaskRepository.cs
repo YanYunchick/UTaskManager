@@ -19,7 +19,10 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
 
     public async Task<PagedList<UserTask>> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
     {
-        var userTasks = await FindAll(trackChanges)
+        var userTasks = await FindByCondition(ut => 
+                                (!userTaskParameters.Priority.HasValue || ut.Priority == userTaskParameters.Priority) && 
+                                (!userTaskParameters.Status.HasValue || ut.Status == userTaskParameters.Status)
+                                , trackChanges)
                                 .OrderBy(ut => ut.Title)
                                 .ToListAsync();
 

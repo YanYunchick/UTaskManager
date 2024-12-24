@@ -23,7 +23,7 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
         var userTasks = await FindAll(trackChanges)
                                 .FilterUserTask(userTaskParameters.Priority, userTaskParameters.Status)
                                 .Search(userTaskParameters.SearchTerm)
-                                .OrderBy(ut => ut.Title)
+                                .Sort(userTaskParameters.OrderBy)
                                 .ToListAsync();
 
         return PagedList<UserTask>.ToPagedList(userTasks, userTaskParameters.PageNumber, userTaskParameters.PageSize);

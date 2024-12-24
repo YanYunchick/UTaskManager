@@ -1,10 +1,13 @@
 ﻿using Entities.Models;
+using System.Linq.Dynamic.Core;
 using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using Repository.Extensions.Utility;
 
 namespace Repository.Extensions;
 
@@ -22,5 +25,18 @@ public static class RepositoryUserTaskExtensions
         var lowerCaseTerm = searchTerm.Trim().ToLower();
 
         return userTasks.Where(ut => ut.Title!.ToLower().Contains(lowerCaseTerm));
+    }
+
+    public static IQueryable<UserTask> Sort(this IQueryable<UserTask> userTasks, string orderByQueryString)
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+            return userTasks.OrderBy(ut => ut.Title);
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<UserTask>(orderByQueryString);
+
+        if (string.IsNullOrWhiteSpace(orderQuery))
+            return userTasks.OrderBy(ut => ut.Title);
+
+        return userTasks.OrderBy(orderQuery);
     }
 }

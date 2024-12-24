@@ -8,6 +8,7 @@ namespace Shared.RequestFeatures;
 
 public class UserTaskParameters : RequestParameters
 {
+    public UserTaskParameters() => OrderBy = "title";
     public int? Priority { get; set; }
     public int? Status { get; set; }
 

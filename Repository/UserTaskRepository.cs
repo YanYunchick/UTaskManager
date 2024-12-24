@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Repository.Extensions;
 
 namespace Repository;
 
@@ -19,10 +20,9 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
 
     public async Task<PagedList<UserTask>> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
     {
-        var userTasks = await FindByCondition(ut => 
-                                (!userTaskParameters.Priority.HasValue || ut.Priority == userTaskParameters.Priority) && 
-                                (!userTaskParameters.Status.HasValue || ut.Status == userTaskParameters.Status)
-                                , trackChanges)
+        var userTasks = await FindAll(trackChanges)
+                                .FilterUserTask(userTaskParameters.Priority, userTaskParameters.Status)
+                                .Search(userTaskParameters.SearchTerm)
                                 .OrderBy(ut => ut.Title)
                                 .ToListAsync();
 

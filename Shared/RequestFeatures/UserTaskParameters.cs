@@ -14,4 +14,6 @@ public class UserTaskParameters : RequestParameters
     public bool ValidPriority => Priority is null ? true : Priority > 0 && Priority < 4;
     public bool ValidStatus => Status is null ? true : Status > 0 && Status < 3;
 
+    public string? SearchTerm { get; set; }
+
 }

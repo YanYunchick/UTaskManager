@@ -10,6 +10,7 @@ using Entities.Models;
 using Shared.DataTransferObjects;
 using AutoMapper;
 using Shared.RequestFeatures;
+using System.Dynamic;
 
 namespace Service;
 
@@ -18,15 +19,18 @@ internal sealed class UserTaskService : IUserTaskService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
+    private readonly IDataShaper<UserTaskDto> _dataShaper;
 
-    public UserTaskService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+    public UserTaskService(IRepositoryManager repository, ILoggerManager logger, 
+                            IMapper mapper, IDataShaper<UserTaskDto> dataShaper)
     {
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
+        _dataShaper = dataShaper;
     }
 
-    public async Task<(IEnumerable<UserTaskDto> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
+    public async Task<(IEnumerable<ExpandoObject> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
     {
         if (!userTaskParameters.ValidPriority)
             throw new UserTaskPriorityBadRequestException();
@@ -37,7 +41,8 @@ internal sealed class UserTaskService : IUserTaskService
         var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(userTaskParameters, trackChanges);
 
         var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasksWithMetaData);
-        return (userTasks: userTasksDto, metaData: userTasksWithMetaData.MetaData);
+        var shapedData = _dataShaper.ShapeData(userTasksDto, userTaskParameters.Fields);
+        return (userTasks: shapedData, metaData: userTasksWithMetaData.MetaData);
     }
 
     public async Task<UserTaskDto> GetUserTaskAsync(Guid id, bool trackChanges)

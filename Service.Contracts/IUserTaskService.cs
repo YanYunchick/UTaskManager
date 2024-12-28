@@ -4,6 +4,7 @@ using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Service.Contracts;
 
 public interface IUserTaskService
 {
-    Task<(IEnumerable<UserTaskDto> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges);
+    Task<(IEnumerable<ExpandoObject> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges);
     Task<UserTaskDto> GetUserTaskAsync(Guid userTaskId, bool trackChanges);
     Task<UserTaskDto> CreateUserTaskAsync(UserTaskForCreationDto userTask);
     Task<IEnumerable<UserTaskDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

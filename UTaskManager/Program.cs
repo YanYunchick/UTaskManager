@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using UTaskManager.Presentation.ActionFilters;
 using Service.DataShaping;
 using Shared.DataTransferObjects;
+using UTaskManager.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,10 +41,13 @@ builder.Services.AddControllers(config =>
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter()
 .AddApplicationPart(typeof(UTaskManager.Presentation.AssemblyReference).Assembly);
+builder.Services.AddCustomMediaTypes();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataShaper<UserTaskDto>, DataShaper<UserTaskDto>>();
+builder.Services.AddScoped<ValidateMediaTypeAttribute>();
+builder.Services.AddScoped<IUserTaskLinks, UserTaskLinks>();
 
 var app = builder.Build();
 

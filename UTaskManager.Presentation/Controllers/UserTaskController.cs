@@ -12,6 +12,7 @@ using UTaskManager.Presentation.ModelBinders;
 using Shared.RequestFeatures;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Entities.LinkModels;
 
 namespace UTaskManager.Presentation.Controllers;
 
@@ -27,13 +28,17 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet]
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetUserTasks([FromQuery] UserTaskParameters userTaskParameters)
     {
-        var pagedResult = await _service.UserTaskService.GetAllUserTasksAsync(userTaskParameters, trackChanges: false);
+        var linkParams = new LinkParameters(userTaskParameters, HttpContext);
 
-        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+        var result = await _service.UserTaskService.GetAllUserTasksAsync(linkParams, trackChanges: false);
 
-        return Ok(pagedResult.userTasks);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(result.metaData));
+
+        return result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) :
+Ok(             result.linkResponse.ShapedEntities);
     }
 
     [HttpGet("{id:guid}", Name = "UserTaskById")]

@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.LinkModels;
+using Entities.Models;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
 using System;
@@ -13,7 +14,7 @@ namespace Service.Contracts;
 
 public interface IUserTaskService
 {
-    Task<(IEnumerable<ExpandoObject> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges);
+    Task<(LinkResponse linkResponse, MetaData metaData)> GetAllUserTasksAsync(LinkParameters linkParameters, bool trackChanges);
     Task<UserTaskDto> GetUserTaskAsync(Guid userTaskId, bool trackChanges);
     Task<UserTaskDto> CreateUserTaskAsync(UserTaskForCreationDto userTask);
     Task<IEnumerable<UserTaskDto>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

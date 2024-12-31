@@ -11,6 +11,7 @@ using Shared.DataTransferObjects;
 using AutoMapper;
 using Shared.RequestFeatures;
 using System.Dynamic;
+using Entities.LinkModels;
 
 namespace Service;
 
@@ -19,30 +20,30 @@ internal sealed class UserTaskService : IUserTaskService
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
-    private readonly IDataShaper<UserTaskDto> _dataShaper;
-
+    private readonly IUserTaskLinks _userTaskLinks;
     public UserTaskService(IRepositoryManager repository, ILoggerManager logger, 
-                            IMapper mapper, IDataShaper<UserTaskDto> dataShaper)
+                            IMapper mapper, IUserTaskLinks userTaskLinks)
     {
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
-        _dataShaper = dataShaper;
+        _userTaskLinks = userTaskLinks;
     }
 
-    public async Task<(IEnumerable<ExpandoObject> userTasks, MetaData metaData)> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
+    public async Task<(LinkResponse linkResponse, MetaData metaData)> GetAllUserTasksAsync(LinkParameters linkParameters, bool trackChanges)
     {
-        if (!userTaskParameters.ValidPriority)
+        if (!linkParameters.UserTaskParameters.ValidPriority)
             throw new UserTaskPriorityBadRequestException();
 
-        if (!userTaskParameters.ValidStatus)
+        if (!linkParameters.UserTaskParameters.ValidStatus)
             throw new UserTaskStatusBadRequestException();
 
-        var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(userTaskParameters, trackChanges);
+        var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(linkParameters.UserTaskParameters, trackChanges);
 
         var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasksWithMetaData);
-        var shapedData = _dataShaper.ShapeData(userTasksDto, userTaskParameters.Fields);
-        return (userTasks: shapedData, metaData: userTasksWithMetaData.MetaData);
+        var links = _userTaskLinks.TryGenerateLinks(userTasksDto, linkParameters.UserTaskParameters.Fields,
+                                                    linkParameters.Context);
+        return (linkResponse: links, metaData: userTasksWithMetaData.MetaData);
     }
 
     public async Task<UserTaskDto> GetUserTaskAsync(Guid id, bool trackChanges)

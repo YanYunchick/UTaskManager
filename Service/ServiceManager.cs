@@ -15,9 +15,9 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IUserTaskService> _userTaskService;
 
     public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, 
-                            IMapper mapper, IDataShaper<UserTaskDto> dataShaper)
+                            IMapper mapper, IUserTaskLinks userTaskLinks)
     {
-        _userTaskService = new Lazy<IUserTaskService>(() => new UserTaskService(repositoryManager, logger, mapper, dataShaper));
+        _userTaskService = new Lazy<IUserTaskService>(() => new UserTaskService(repositoryManager, logger, mapper, userTaskLinks));
 
     }
 

@@ -28,6 +28,7 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet]
+    [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetUserTasks([FromQuery] UserTaskParameters userTaskParameters)
     {
@@ -38,7 +39,7 @@ public class UserTaskController : ControllerBase
         Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(result.metaData));
 
         return result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) :
-Ok(             result.linkResponse.ShapedEntities);
+                Ok(result.linkResponse.ShapedEntities);
     }
 
     [HttpGet("{id:guid}", Name = "UserTaskById")]
@@ -101,5 +102,13 @@ Ok(             result.linkResponse.ShapedEntities);
         await _service.UserTaskService.SaveChangesForPatchAsync(result.userTaskToPatch, result.userTaskEntity);
 
         return NoContent();
+    }
+
+    [HttpOptions]
+    public IActionResult GetUserTasksOptions()
+    {
+        Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, DELETE");
+
+        return Ok();
     }
 }

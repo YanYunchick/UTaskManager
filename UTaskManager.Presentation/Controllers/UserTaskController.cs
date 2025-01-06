@@ -13,6 +13,7 @@ using Shared.RequestFeatures;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Entities.LinkModels;
+using Marvin.Cache.Headers;
 
 namespace UTaskManager.Presentation.Controllers;
 
@@ -27,7 +28,7 @@ public class UserTaskController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "GetUserTasks")]
     [HttpHead]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetUserTasks([FromQuery] UserTaskParameters userTaskParameters)
@@ -49,7 +50,7 @@ public class UserTaskController : ControllerBase
         return Ok(userTask);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "CreateUserTask")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateUserTask([FromBody] UserTaskForCreationDto userTask)
     {

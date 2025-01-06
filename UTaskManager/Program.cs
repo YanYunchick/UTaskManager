@@ -38,6 +38,7 @@ builder.Services.AddControllers(config =>
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
     config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+    config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
 }).AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter()
 .AddApplicationPart(typeof(UTaskManager.Presentation.AssemblyReference).Assembly);
@@ -48,6 +49,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataShaper<UserTaskDto>, DataShaper<UserTaskDto>>();
 builder.Services.AddScoped<ValidateMediaTypeAttribute>();
 builder.Services.AddScoped<IUserTaskLinks, UserTaskLinks>();
+builder.Services.ConfigureResponseCaching();
+builder.Services.ConfigureHttpCacheHeaders();
 
 var app = builder.Build();
 
@@ -71,6 +74,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 app.UseCors("CorsPolicy");
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
 
 app.UseAuthorization();
 

@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,9 @@ namespace UTaskManager.Extensions
                 {
                     systemTextJsonOutputFormatter.SupportedMediaTypes
                         .Add("application/vnd.yy.hateoas+json");
+                    systemTextJsonOutputFormatter.SupportedMediaTypes
+                        .Add("application/vnd.yy.apiroot+json");
+
                 }
 
                 var xmlOutputFormatter = config.OutputFormatters
@@ -63,8 +67,25 @@ namespace UTaskManager.Extensions
                 {
                     xmlOutputFormatter.SupportedMediaTypes
                         .Add("application/vnd.yy.hateoas+xml");
+                    xmlOutputFormatter.SupportedMediaTypes
+                        .Add("application/vnd.yy.apiroot+xml");
                 }
             });
         }
+
+        public static void ConfigureResponseCaching(this IServiceCollection services) =>
+            services.AddResponseCaching();
+
+        public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders(
+                (expirationOpt) =>
+                {
+                    expirationOpt.MaxAge = 65;
+                    expirationOpt.CacheLocation = CacheLocation.Private;
+                },
+                (validationOpt) =>
+                {
+                    validationOpt.MustRevalidate = true;
+                });
     }
 }

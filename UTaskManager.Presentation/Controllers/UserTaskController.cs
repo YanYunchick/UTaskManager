@@ -14,11 +14,13 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Entities.LinkModels;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UTaskManager.Presentation.Controllers;
 
 [Route("api/userTasks")]
 [ApiController]
+[Authorize]
 public class UserTaskController : ControllerBase
 {
     private readonly IServiceManager _service;

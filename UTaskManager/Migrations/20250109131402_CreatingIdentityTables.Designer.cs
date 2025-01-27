@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository;
 
@@ -11,9 +12,11 @@ using Repository;
 namespace UTaskManager.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20250109131402_CreatingIdentityTables")]
+    partial class CreatingIdentityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,24 +136,24 @@ namespace UTaskManager.Migrations
                         new
                         {
                             Id = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
-                            CreatedAt = new DateTime(2025, 1, 9, 16, 22, 17, 614, DateTimeKind.Local).AddTicks(9256),
+                            CreatedAt = new DateTime(2025, 1, 9, 16, 14, 0, 813, DateTimeKind.Local).AddTicks(4625),
                             Deadline = new DateTime(2024, 12, 25, 15, 30, 0, 0, DateTimeKind.Unspecified),
                             Description = "TestDescription1",
                             Priority = 1,
                             Status = 1,
                             Title = "TestTitle1",
-                            UpdatedAt = new DateTime(2025, 1, 9, 16, 22, 17, 614, DateTimeKind.Local).AddTicks(9276)
+                            UpdatedAt = new DateTime(2025, 1, 9, 16, 14, 0, 813, DateTimeKind.Local).AddTicks(4645)
                         },
                         new
                         {
                             Id = new Guid("3d490a70-94ce-4d15-9494-5248280c2ce3"),
-                            CreatedAt = new DateTime(2025, 1, 9, 16, 22, 17, 614, DateTimeKind.Local).AddTicks(9281),
+                            CreatedAt = new DateTime(2025, 1, 9, 16, 14, 0, 813, DateTimeKind.Local).AddTicks(4650),
                             Deadline = new DateTime(2025, 12, 25, 15, 30, 0, 0, DateTimeKind.Unspecified),
                             Description = "TestDescription2",
                             Priority = 2,
                             Status = 0,
                             Title = "TestTitle2",
-                            UpdatedAt = new DateTime(2025, 1, 9, 16, 22, 17, 614, DateTimeKind.Local).AddTicks(9281)
+                            UpdatedAt = new DateTime(2025, 1, 9, 16, 14, 0, 813, DateTimeKind.Local).AddTicks(4650)
                         });
                 });
 
@@ -179,20 +182,6 @@ namespace UTaskManager.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "3472791a-25b5-4804-ad2d-ad75ae671c57",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
-                            Id = "fd9e896e-29dd-4d9a-89dd-853f462ff988",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

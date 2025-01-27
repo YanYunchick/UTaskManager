@@ -11,5 +11,6 @@ public class MappingProfile : Profile
         CreateMap<UserTask, UserTaskDto>();
         CreateMap<UserTaskForCreationDto, UserTask>();
         CreateMap<UserTaskForUpdateDto, UserTask>().ReverseMap();
+        CreateMap<UserForRegistrationDto, User>();
     }
 }

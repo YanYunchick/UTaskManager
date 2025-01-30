@@ -12,6 +12,8 @@ using AutoMapper;
 using Shared.RequestFeatures;
 using System.Dynamic;
 using Entities.LinkModels;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Service;
 
@@ -21,24 +23,29 @@ internal sealed class UserTaskService : IUserTaskService
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
     private readonly IUserTaskLinks _userTaskLinks;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     public UserTaskService(IRepositoryManager repository, ILoggerManager logger, 
-                            IMapper mapper, IUserTaskLinks userTaskLinks)
+                            IMapper mapper, IUserTaskLinks userTaskLinks,
+                            IHttpContextAccessor httpContextAccessor)
     {
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
         _userTaskLinks = userTaskLinks;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<(LinkResponse linkResponse, MetaData metaData)> GetAllUserTasksAsync(LinkParameters linkParameters, bool trackChanges)
     {
+        var userId = GetCurrentUserId();
+
         if (!linkParameters.UserTaskParameters.ValidPriority)
             throw new UserTaskPriorityBadRequestException();
 
         if (!linkParameters.UserTaskParameters.ValidStatus)
             throw new UserTaskStatusBadRequestException();
 
-        var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(linkParameters.UserTaskParameters, trackChanges);
+        var userTasksWithMetaData = await _repository.UserTask.GetAllUserTasksAsync(userId, linkParameters.UserTaskParameters, trackChanges);
 
         var userTasksDto = _mapper.Map<IEnumerable<UserTaskDto>>(userTasksWithMetaData);
         var links = _userTaskLinks.TryGenerateLinks(userTasksDto, linkParameters.UserTaskParameters.Fields,
@@ -50,6 +57,11 @@ internal sealed class UserTaskService : IUserTaskService
     {
         var userTask = await GetUserTaskAndCheckIfItExists(id, trackChanges);
 
+        if (userTask.UserId != GetCurrentUserId())
+        {
+            throw new UnauthorizedAccessException("You do not have access to this task.");
+        }
+
         var userTaskDto = _mapper.Map<UserTaskDto>(userTask);
         return userTaskDto;
     }
@@ -57,6 +69,7 @@ internal sealed class UserTaskService : IUserTaskService
     public async Task<UserTaskDto> CreateUserTaskAsync(UserTaskForCreationDto userTask)
     {
         var userTaskEntity = _mapper.Map<UserTask>(userTask);
+        userTaskEntity.UserId = GetCurrentUserId();
         userTaskEntity.UpdatedAt = DateTime.Now;
         userTaskEntity.CreatedAt = DateTime.Now;
 
@@ -74,6 +87,7 @@ internal sealed class UserTaskService : IUserTaskService
             throw new IdParametersBadRequestException();
 
         var userTaskEntities = await _repository.UserTask.GetByIdsAsync(ids, trackChanges);
+
         if (ids.Count() != userTaskEntities.Count())
             throw new CollectionByIdsBadRequestException();
 
@@ -86,6 +100,11 @@ internal sealed class UserTaskService : IUserTaskService
     {
         var userTask = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
 
+        if (userTask.UserId != GetCurrentUserId())
+        {
+            throw new UnauthorizedAccessException("You do not have access to this task.");
+        }
+
         _repository.UserTask.DeleteUserTask(userTask);
         await _repository.SaveAsync();
     }
@@ -93,6 +112,11 @@ internal sealed class UserTaskService : IUserTaskService
     public async Task UpdateUserTaskAsync(Guid userTaskId, UserTaskForUpdateDto userTaskForUpdate, bool trackChanges)
     {
         var userTaskEntity = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
+
+        if (userTaskEntity.UserId != GetCurrentUserId())
+        {
+            throw new UnauthorizedAccessException("You do not have access to this task.");
+        }
 
         _mapper.Map(userTaskForUpdate, userTaskEntity);
         userTaskEntity.UpdatedAt = DateTime.Now;
@@ -104,6 +128,11 @@ internal sealed class UserTaskService : IUserTaskService
         Guid userTaskId, bool trackChanges)
     {
         var userTaskEntity = await GetUserTaskAndCheckIfItExists(userTaskId, trackChanges);
+
+        if (userTaskEntity.UserId != GetCurrentUserId())
+        {
+            throw new UnauthorizedAccessException("You do not have access to this task.");
+        }
 
         var userTaskToPatch = _mapper.Map<UserTaskForUpdateDto>(userTaskEntity);
         return (userTaskToPatch, userTaskEntity);
@@ -121,5 +150,15 @@ internal sealed class UserTaskService : IUserTaskService
         if (userTask is null)
             throw new UserTaskNotFoundException(id);
         return userTask;
+    }
+
+    private string GetCurrentUserId()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        return userId;
     }
 }

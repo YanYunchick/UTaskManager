@@ -62,6 +62,7 @@ public class UserTaskController : ControllerBase
     }
 
     [HttpGet("collection/({ids})", Name = "UserTaskCollection")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> GetUserTaskCollection(
         [ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
     {
@@ -110,7 +111,7 @@ public class UserTaskController : ControllerBase
     [HttpOptions]
     public IActionResult GetUserTasksOptions()
     {
-        Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, DELETE");
+        Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
 
         return Ok();
     }

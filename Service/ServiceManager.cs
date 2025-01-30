@@ -2,6 +2,8 @@
 using Contracts;
 using Entities.ConfigurationModels;
 using Entities.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -24,10 +26,11 @@ public sealed class ServiceManager : IServiceManager
                             IMapper mapper, 
                             IUserTaskLinks userTaskLinks, 
                             UserManager<User> userManager,
-                            IOptions<JwtConfiguration> configuration)
+                            IOptions<JwtConfiguration> configuration,
+                            IHttpContextAccessor httpContextAccessor)
     {
         _userTaskService = new Lazy<IUserTaskService>(() => 
-            new UserTaskService(repositoryManager, logger, mapper, userTaskLinks));
+            new UserTaskService(repositoryManager, logger, mapper, userTaskLinks, httpContextAccessor));
         _authenticationService = new Lazy<IAuthenticationService>(() =>
             new AuthenticationService(logger, mapper, userManager, configuration));
     }

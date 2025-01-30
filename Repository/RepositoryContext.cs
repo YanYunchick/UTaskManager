@@ -23,7 +23,7 @@ public class RepositoryContext : IdentityDbContext<User>
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new UserTaskConfiguration());
+        //modelBuilder.ApplyConfiguration(new UserTaskConfiguration());
         modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
     public DbSet<UserTask>? UserTasks { get; set; }

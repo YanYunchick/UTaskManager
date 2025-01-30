@@ -18,9 +18,10 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
     {
     }
 
-    public async Task<PagedList<UserTask>> GetAllUserTasksAsync(UserTaskParameters userTaskParameters, bool trackChanges)
+    public async Task<PagedList<UserTask>> GetAllUserTasksAsync(string userId, UserTaskParameters userTaskParameters, bool trackChanges)
     {
         var userTasks = await FindAll(trackChanges)
+                                .Where(ut => ut.UserId == userId)
                                 .FilterUserTask(userTaskParameters.Priority, userTaskParameters.Status)
                                 .Search(userTaskParameters.SearchTerm)
                                 .Sort(userTaskParameters.OrderBy)

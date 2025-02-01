@@ -10,6 +10,7 @@ using Service.DataShaping;
 using Shared.DataTransferObjects;
 using UTaskManager.Utility;
 using AspNetCoreRateLimit;
+using Service.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,9 @@ builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
+builder.Services.AddFluentEmail(builder.Configuration);
+builder.Services.AddScoped<IEmailService, EmailService.EmailService>();
+builder.Services.AddHostedService<UserTaskDeadlineNotificationService>();
 
 var app = builder.Build();
 

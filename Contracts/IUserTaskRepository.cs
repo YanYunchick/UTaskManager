@@ -16,4 +16,5 @@ public interface IUserTaskRepository
     void CreateUserTask(UserTask userTask);
     Task<IEnumerable<UserTask>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
     void DeleteUserTask(UserTask userTask);
+    Task<IEnumerable<UserTask>> GetUserTasksWithDeadlineAsync(DateTime date, bool trackChanges);
 }

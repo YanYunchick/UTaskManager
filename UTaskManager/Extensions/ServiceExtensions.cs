@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service;
 using Service.Contracts;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 
 namespace UTaskManager.Extensions
@@ -159,5 +161,18 @@ namespace UTaskManager.Extensions
 
         public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
             services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+
+        public static void AddFluentEmail(this IServiceCollection services, IConfiguration configuration)
+        {
+            var smtpConfiguration = new SmtpConfiguration();
+            configuration.Bind(smtpConfiguration.Section, smtpConfiguration);
+            var password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+            
+            services.AddFluentEmail(smtpConfiguration.From)
+                .AddSmtpSender(smtpConfiguration.SmtpServer,
+                               Convert.ToInt32(smtpConfiguration.Port),
+                               smtpConfiguration.UserName,
+                               password);
+        }
     }
 }

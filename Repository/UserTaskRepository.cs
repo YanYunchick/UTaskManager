@@ -40,6 +40,11 @@ public class UserTaskRepository : RepositoryBase<UserTask>, IUserTaskRepository
         await FindByCondition(x => ids.Contains(x.Id), trackChanges)
         .ToListAsync();
 
-    public void DeleteUserTask(UserTask userTask) => Delete(userTask); 
+    public void DeleteUserTask(UserTask userTask) => Delete(userTask);
 
+    public async Task<IEnumerable<UserTask>> GetUserTasksWithDeadlineAsync(DateTime date, bool trackChanges) =>
+        await FindByCondition(ut => ut.Deadline.Date == date.Date, trackChanges)
+                .Include(ut => ut.User)
+                .OrderBy(ut => ut.Deadline)
+                .ToListAsync();
 }
